@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Home{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<body>
+    <div class="ui fluid container" style="padding-left: 15%; padding-right: 15%; padding-top:8%;">
+        {% if g.user %}
+        <div class="ui header left aligned" style="font-size: 4em; font-family: 'Besley', serif;">Welcome Back {{
+            g.user[1] }}!
+        </div>
+        {% else %}
+        <div class="ui header left aligned" style="font-size: 4em; font-family: 'Besley', serif;">Welcome to Scraps!
+        </div>
+        {% endif %}
+        <div class="ui placeholder segment" style="margin-top: 2%;">
+            <div class="ui two column very relaxed stackable grid" style="padding: 5%;">
+                <div class="middle aligned column">
+                    <a href="{{ url_for('search.ingredients_search') }}">
+                        <div class="huge ui button grow-on-hover">
+                            <i class="search icon"></i>
+                            Search
+                        </div>
+                    </a>
+                </div>
+                <div class="middle aligned column">
+                    {% if g.user %}
+                    <a href="{{ url_for('profile.profile')}}">
+                        <div class="huge ui button grow-on-hover">
+                            <i class="user circle icon"></i>
+                            My Profile
+                        </div>
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('auth.login')}}">
+                        <div class="ui huge button grow-on-hover">
+                            <i class="question circle icon"></i>
+                            About
+                        </div>
+                    </a>
+                    {% endif %}
+
+                </div>
+            </div>
+            <div class="ui vertical divider">
+                Or
+            </div>
+        </div>
+    </div>
+
+</body>
+{% endblock %}

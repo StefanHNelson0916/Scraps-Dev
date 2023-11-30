@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block header %}
+<h1>{% block title %}Profile{% endblock %}</h1>
+{% endblock %}
+{% block content %}
+
+<body>
+    <div class="ui fluid container" style="padding-left: 15%; padding-right: 15%; padding-top:2%;">
+        <div class="ui header left aligned" style="padding-bottom: 5%; font-size: 4em; font-family: 'Besley', serif;">
+            Your Scraps Profile
+        </div>
+        <div class="ui three column grid">
+            <div class="six
+             wide column">
+                <div class="ui header left aligned" style="font-size: 2.0em; font-family: 'Besley', serif;">
+                    History
+                </div>
+                <div class="ui secondary segment">
+                    <div class="ui list">
+                        {% for history_item in user_history %}
+                        <div class="item grow-on-hover">
+                            <a href="{{ url_for('search.history_item', item_id=history_item['action_id']) }}">
+
+                                <div class="ui segment">
+                                    <div class="ui list" style="padding: 0px">
+                                        <div class="item">
+                                            <div class="ui medium header"
+                                                style="font-family:'Crimson Pro'; font-size: 1.75em">
+                                                {{ history_item['action_type'] }}
+                                            </div>
+                                        </div>
+                                        <div class="item history-item">
+                                            <div class="ui horizontal list">
+                                                <div class="item">
+                                                    <div class="ui big horizontal label" style="color:black;">
+                                                        {{ history_item['action_content'] }} </div>
+                                                </div>
+                                                <div class="item">
+                                                    <div class="item history-item">
+                                                        {{ history_item['occurred_at'] }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="one wide column"></div>
+            <div class="four wide column">
+                <div class="ui header left aligned" style="font-size: 2.0em; font-family: 'Besley', serif;">Saved
+                    Recipes
+                </div>
+
+                <div class="ui secondary segment">
+                    <div class="ui cards">
+                        {% if saved_recipes %}
+                        {% for recipe in saved_recipes %}
+                        <div class="card">
+
+                            <div class="content" style="background-color: black; opacity: 0.85">
+                                <div class="ui grid">
+                                    <div class="thirteen wide column">
+                                        <a
+                                            href="{{ url_for('recipe.get_saved_recipe', recipe_id=recipe.id, dish_type=recipe.dish_type, name=recipe.name) }}">
+                                            <div class="ui header left aligned"
+                                                style="font-size: 1.5em; font-family: 'Besley', serif; color: white;">
+                                                {{recipe.name}}
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="three wide column">
+                                        <a href="{{ url_for('profile.unsave_recipe', recipe_id=recipe.id)}}">
+                                            <i class="inverted x icon grow-on-hover"></i>
+                                        </a>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="card">
+                            <div class="content" style="background-color: black; opacity: 0.85">
+                                <div class="ui grid">
+                                    <div class="thirteen wide column">
+                                        <div class="ui header left aligned"
+                                            style="font-size: 1.5em; font-family: 'Besley', serif; color: white;">
+                                            No Recipes Saved
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+{% endblock %}

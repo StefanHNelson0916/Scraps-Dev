@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Search Bar{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<body>
+    <div class="ui left aligned fluid container searchbar_container">
+        <h3 class="ui huge header" style="font-family: 'Besley'">
+            Choose a Dish Type
+        </h3>
+
+        <div id="dishTypeButtons" class="ui buttons">
+            <button class="ui huge button dishTypeButton active" style="font-family: 'Crimson Pro'">Main Dish</button>
+            <button class="ui huge button dishTypeButton" style="font-family: 'Crimson Pro'">Side Dish</button>
+            <button class="ui huge button dishTypeButton" style="font-family: 'Crimson Pro'">Dessert</button>
+        </div>
+
+        <h3 class="ui huge header" style="font-family: 'Besley'">
+            Add Ingredients
+        </h3>
+
+        <div class="ui list" style="margin-bottom: 5px;">
+
+            <div class="item">
+
+            </div>
+
+            <div id="alreadyInList" class="ui disabled red inverted compact segment"
+                style="opacity: 0.85; display:none; margin-top: 0px">
+            </div>
+
+            <div class="ui massive fluid icon input ">
+
+                <input type="text" id="input" onkeyup="addToList(event)" style="font-family: 'Crimson Pro'"
+                    placeholder="Type here..." />
+
+                <i class="large link plus square icon" onclick="addToList('Enter')"></i>
+
+            </div>
+
+        </div>
+
+        <div id="list-container" class="ui horizontal list"></div>
+
+        <h3 class="ui huge header" style="font-family: 'Besley';margin-top:5px">
+            Find Recipes
+        </h3>
+
+        <div class="ui horizontal list">
+            <div class="item top aligned">
+                <a id="searchButtonLink" href="" style="color:inherit; pointer-events: none">
+                <button id="searchButton" class="ui huge right labeled icon disabled button"
+                    style="font-family: 'Crimson Pro';">
+                    See Search Results
+                </button>
+                </a>
+            </div>
+            <div class="item">
+                <div id="recipeCount" class="ui compact segment" style="padding: 9px; padding-left:12px">
+                    <div class="ui horizontal list">
+                        <div class="item">
+                            <p id="searchResultsText">
+                                Recipes Found
+                            </p>
+                        </div>
+                        <div class="item">
+                            <div id="recipeCountNumber" class="ui black circular label"
+                                style="margin-left: 5px;  font-family: 'Crimson Pro'">?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+<script>
+    let ingredients = [];
+    let dish_type = 'Main Dish'
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const buttons = document.querySelectorAll('.dishTypeButton');
+
+        buttons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                // Remove the "active" class from all buttons
+                buttons.forEach(function (btn) {
+                    btn.classList.remove('active');
+                });
+
+                // Add the "active" class to the clicked button
+                dish_type = button.textContent
+                getRecipeCount()
+                button.classList.add('active');
+            });
+        });
+    });
+
+    function addToList(event) {
+        if (event.key === "Enter" || event === "Enter") {
+            const input = document.getElementById('input');
+            let input_text = input.value.trim();
+            input_text = input_text.toLowerCase();
+
+            input.value = ''
+
+            if (input_text !== "") {
+                if (ingredients.includes(input_text)) {
+                    element = document.getElementById('alreadyInList')
+                    element.style.display = ''
+                    element.textContent = `You already added ${input_text}!`
+                }
+                else {
+                    element = document.getElementById('alreadyInList')
+                    element.style.display = 'none'
+                    ingredients.push(input_text)
+
+                    getRecipeCount(ingredients)
+
+                    ingredient_list_container = document.getElementById("list-container")
+
+                    const item_card = document.createElement("div");
+                    item_card.classList.add("item")
+                    item_card.id = input_text
+
+                    const card_segment = document.createElement("div");
+                    card_segment.classList.add("ui", "compact", "segment");
+                    card_segment.style.paddingTop = "10px"
+                    card_segment.style.paddingBottom = "10px"
+
+                    const list_in_segment = document.createElement("div");
+                    list_in_segment.classList.add("ui", "horizontal", "list");
+
+                    const text_item = document.createElement("div")
+                    text_item.classList.add("item")
+
+                    const item_content = document.createElement("div")
+                    item_content.classList.add("content")
+
+                    const text = document.createElement("h4")
+                    text.classList.add("header")
+                    text.style.fontFamily = "Crimson Pro"
+                    text.textContent = input_text
+
+                    const icon_item = document.createElement("div");
+                    icon_item.classList.add("item");
+
+                    const x_icon = document.createElement("i");
+                    x_icon.classList.add("x", "icon", "link", "x-icon");
+                    x_icon.addEventListener("click", function () {
+                        elementToRemove = document.getElementById(input_text)
+                        if (elementToRemove) {
+                            elementToRemove.remove()
+                        }
+                        ingredients = ingredients.filter(item => item !== elementToRemove.id);
+                        getRecipeCount(ingredients)
+                        displaySearchResults()
+                    })
+
+                    item_content.appendChild(text)
+                    text_item.appendChild(item_content)
+                    list_in_segment.appendChild(text_item)
+
+                    icon_item.appendChild(x_icon)
+                    list_in_segment.appendChild(icon_item)
+
+                    card_segment.appendChild(list_in_segment)
+
+                    item_card.appendChild(card_segment)
+                    ingredient_list_container.appendChild(item_card)
+                }
+
+            }
+        }
+    }
+
+    function displaySearchResults(data) {
+        const resultsRecipeCount = document.getElementById("recipeCount")
+        const searchButton = document.getElementById("searchButton")
+        const searchButtonLink = document.getElementById("searchButtonLink")
+        const resultText = document.getElementById("searchResultsText")
+
+        if (ingredients.length > 0) {
+            console.log("here")
+            console.log("ingredients")
+            recipeCountNumber.textContent = data
+            resultText.textContent = `${dish_type} Recipes Found`
+
+            resultsRecipeCount.style.display = ""
+            searchButton.classList.remove("disabled")
+            searchButtonLink.style.pointerEvents = ""
+
+            search_type = 'Ingredients'
+            search_input = ingredients.join('+')
+            dish_type = dish_type
+            searchButtonLink.href = `Results/Ingredients/${search_input}/${dish_type}`
+        }
+        else {
+            resultText.textContent = "Recipes Found"
+            recipeCountNumber.textContent = "?"
+            searchButtonLink.style.pointerEvents = "none"
+            searchButton.classList.add("disabled")
+        }
+    }
+
+    function getRecipeCount() {
+        const recipeCountNumber = document.getElementById("recipeCountNumber");
+        if (ingredients.length > 0) {
+            search_type = 'Ingredients'
+            search_input = ingredients.join('+')
+            dish_type = dish_type
+            fetch(`RecipeCount/${search_type}/${search_input}/${dish_type}`, { method: 'GET' })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    displaySearchResults(data)
+                })
+                .catch(error => {
+                    console.log(`Error: ${error}`);
+                });
+        }
+    }
+</script>
+</body>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Search Bar{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<body>
+    <div class="ui left aligned fluid container searchbar_container">
+        <h3 class="ui huge header" style="font-family: 'Besley'">
+            Choose a Dish Type
+        </h3>
+
+        <div id="dishTypeButtons" class="ui buttons">
+            <button class="ui huge button dishTypeButton active" style="font-family: 'Crimson Pro'">Main Dish</button>
+            <button class="ui huge button dishTypeButton" style="font-family: 'Crimson Pro'">Side Dish</button>
+            <button class="ui huge button dishTypeButton" style="font-family: 'Crimson Pro'">Dessert</button>
+        </div>
+
+        <h3 class="ui huge header" style="font-family: 'Besley'">
+            Search by Recipe Name or Keyword
+        </h3>
+
+        <div class="ui list" style="margin-bottom: 5px;">
+            <div class="ui massive fluid icon input ">
+                <input type="text" id="input" onkeyup="onSearchbarInput(event)" style="font-family: 'Crimson Pro'"
+                    placeholder="Type here..." />
+            </div>
+
+        </div>
+
+        <div class="ui horizontal list">
+            <div class="item top aligned">
+                <a id="searchButtonLink" href="" style="color:inherit; pointer-events: none">
+                    <button id="searchButton" class="ui huge right labeled icon disabled button"
+                        style="font-family: 'Crimson Pro';">
+                        See Search Results
+                    </button>
+                </a>
+            </div>
+            <div class="item">
+                <div id="recipeCount" class="ui compact segment" style="padding: 9px; padding-left:12px">
+                    <div class="ui horizontal list">
+                        <div class="item">
+                            <p id="searchResultsText">
+                                Recipes Found
+                            </p>
+                        </div>
+                        <div class="item">
+                            <div id="recipeCountNumber" class="ui black circular label"
+                                style="margin-left: 5px;  font-family: 'Crimson Pro'">?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let dish_type = 'Main Dish'
+        let searchbar_content = ''
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const buttons = document.querySelectorAll('.dishTypeButton');
+            buttons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Remove the "active" class from all buttons
+                    buttons.forEach(function (btn) {
+                        btn.classList.remove('active');
+                    });
+
+                    // Add the "active" class to the clicked button
+                    dish_type = button.textContent
+                    button.classList.add('active');
+                    getRecipeCount(searchbar_content)
+                });
+            });
+            input.value = ''
+        });
+
+        function onSearchbarInput(event) {
+            const input = document.getElementById('input');
+            let input_text = input.value.trim();
+            input_text = input_text.toLowerCase();
+            searchbar_content = input_text
+            if (input_text !== "") {
+                searchButton.classList.remove("disabled")
+                searchButtonLink.style.pointerEvents = ""
+                const search_input = input_text
+                searchButtonLink.href = `Results/String/${search_input}/${dish_type}`
+                getRecipeCount(input_text)
+            }
+            if (event.key === "Enter") {
+                searchButtonLink.click()
+            }
+            if (input_text === "") {
+                const resultText = document.getElementById("searchResultsText")
+                resultText.textContent = "Recipes Found"
+                recipeCountNumber.textContent = "?"
+                searchButtonLink.style.pointerEvents = "none"
+                searchButton.classList.add("disabled")
+            }
+        }
+
+        function getRecipeCount(input) {
+            const recipeCountNumber = document.getElementById("recipeCountNumber");
+            const search_input = input
+            dish_type = dish_type
+            fetch(`RecipeCount/String/${search_input}/${dish_type}`, { method: 'GET' })
+                .then(response => response.json())
+                .then(data => {
+                    displaySearchResults(data)
+                })
+                .catch(error => {
+                    console.log(`Error: ${error}`);
+                });
+        }
+
+        function displaySearchResults(data) {
+            const resultsRecipeCount = document.getElementById("recipeCount")
+            const searchButton = document.getElementById("searchButton")
+            const searchButtonLink = document.getElementById("searchButtonLink")
+            const resultText = document.getElementById("searchResultsText")
+
+            recipeCountNumber.textContent = data
+            resultText.textContent = `${dish_type} Recipes Found`
+
+            resultsRecipeCount.style.display = ""
+            searchButton.classList.remove("disabled")
+            searchButtonLink.style.pointerEvents = ""
+            searchButtonLink.href = `Results/String/${searchbar_content}/${dish_type}`
+        }
+    </script>
+</body>
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Search Results{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="ui fluid container center aligned" style="padding-left: 15%; padding-right: 10%; padding-bottom: 0%">
+    {% if recipes %}
+    <!-- Recipes Found Start -->
+    <div class="ui header left aligned" style="font-size: 4em; font-family: 'Besley', serif;">{{ dish_type }} with {{
+        search_input }}</div>
+    <div class="ui two column grid">
+        <div class="ten wide column">
+            <div class="ui segments">
+                <div class="ui secondary segment"
+                    style="font-size: 1.40em; font-family: 'Crimson Pro', serif; color: black;">
+                    Recipes
+                </div>
+                <div class="ui segment scrollable-segment">
+                    <div class="ui two column extra padded grid">
+                        {% for recipe in recipes %}
+                        <div class="eight wide computer column">
+                            <a href="{{ url_for('recipe.page', recipe_id=recipe['id'], dish_type=dish_type) }}">
+                                <div class="ui segments grow-on-hover">
+                                    <div class="ui black segment">
+                                        <div class="ui list">
+                                            <div class="item">
+                                                <h2 class="ui header" style="font-family:'Crimson Pro'">
+                                                    {{ recipe['name'] }}
+                                                </h2>
+                                            </div>
+                                            {% if recipe['missing_ingredients'] is none %}
+                                            {% else %}
+                                            <div class="item">
+                                                <div class="ui horizontal list">
+                                                    <div class="item">
+                                                        <div class="middle aligned content" style="color: black;">
+                                                            Missing Ingredients <div class="count-label"
+                                                                style="margin-left: 15px;opacity: 0.85;font-size: 1.15em;">
+                                                                {{recipe['missing_ingredients'] }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="ui horizontal segments">
+                                        <div class="ui segment">
+                                            <div class="ui horizontal list">
+                                                <div class="item">
+                                                    <div class="middle aligned content" style="color: black;">
+                                                        Ingredients
+                                                        <div class="count-label"
+                                                            style="margin-left: 15px;opacity: 0.85;font-size: 1.15em;">
+                                                            {{ recipe['ingredient_count'] }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="ui segment">
+                                            <div style="color: black;">
+                                                Steps
+                                                <div class="count-label"
+                                                    style="margin-left: 15px;opacity: 0.85;font-size: 1.15em;">
+                                                    {{recipe['step_count']}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Recipes Found End -->
+        <!-- Order By Start -->
+        <div class="three wide column">
+            <div class="ui segments">
+                <div class="ui secondary segment"
+                    style="font-size: 1.40em; font-family: 'Crimson Pro', serif; color: black;">
+                    Order By
+                </div>
+                <div class="ui segment center aligned">
+                    <div class="ui fluid container">
+                        <div class="ui selection dropdown" id="orderBy">
+                            <input type="hidden" name="options">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">{{ order_by }}</div>
+                            <div class="menu">
+                                <div class="item" data-value="aToZ">A - Z</div>
+                                <div class="item" data-value="zToA">Z - A</div>
+                                <div class="item" data-value="ingredientsHigh">Ingredients: High</div>
+                                <div class="item" data-value="ingredientsLow">Ingredients: Low</div>
+                                <div class="item" data-value="stepsHigh">Steps: High</div>
+                                <div class="item" data-value="stepsLow">Steps: Low</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui segment">
+                    <a id="dropDownLink">
+                        <i class="large sync alternate icon rotate-on-hover"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- Order By Start -->
+        {% else %}
+        <!-- No Recipes Found Start -->
+        <div class="ui list">
+            <div class="item" style="padding: 5%;">
+                <div class="ui header" style="font-size: 4em; font-family: 'Besley', serif;">Sorry no recipes
+                    were
+                    found... <br>Try searching for something else!
+                </div>
+            </div>
+            <div class="item">
+                <a href="{{ url_for('search.ingredients_search')}}">
+                    <button class="ui massive button grow-on-hover">
+                        Back to Search
+                        <i class="undo icon" style="margin-left: 15px;"></i>
+                    </button>
+                </a>
+            </div>
+        </div>
+        <!-- No Recipes Found End -->
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+    integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer">
+    </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.js"
+    integrity="sha512-Xo0Jh8MsOn72LGV8kU5LsclG7SUzJsWGhXbWcYs2MAmChkQzwiW/yTQwdJ8w6UA9C6EVG18GHb/TrYpYCjyAQw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    const recipes = '{{ recipes }}'
+    if (recipes !== '[]') {
+        function setSegmentMaxHeight() {
+            const windowHeight = (window.innerHeight) / 1.10;
+            const segment = document.querySelector(".scrollable-segment");
+            segment.style.maxHeight = (windowHeight - 175) + "px";
+        }
+        window.addEventListener("resize", setSegmentMaxHeight);
+        setSegmentMaxHeight();
+
+        var elements = document.querySelectorAll(".count-label");
+        elements.forEach(function (element) {
+            let count = element.textContent
+            if (count < 11) {
+                element.className = 'ui green small label'
+            }
+            else if (count < 21 && count > 10) {
+                element.className = 'ui yellow small label'
+            }
+            else if (count > 20) {
+                element.className = 'ui red small label'
+            }
+        });
+
+        var search_input = "{{ search_input }}"
+        var dish_type = "{{ dish_type }}"
+
+        $(document).ready(function () {
+            orderBy = null
+            $('#orderBy').dropdown({
+                onChange: function (value, text, $selectedItem) {
+                    // Change the value of the variable when a selection is made
+                    orderBy = $selectedItem.data('value');
+                    const orderByLink = document.getElementById('dropDownLink')
+                    orderByLink.href = `/Search/OrderResults/Ingredients/${search_input}/${dish_type}/${orderBy}`
+                }
+            });
+        });
+    }
+</script>
+{% endblock %}

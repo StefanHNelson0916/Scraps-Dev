@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}{{recipe['name']}}{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="ui fluid container center aligned" style="padding-left: 15%; padding-right: 15%; margin-top: 3%;">
+    <div class="ui huge header left aligned" style="font-size: 6em; font-family: 'Besley', serif;">
+        {{ recipe['name'] }}
+    </div>
+    <div class="ui three column grid">
+        <div class="nine wide column">
+            <div class="ui segments">
+                <div class="ui segment secondary header"
+                    style="font-size: 1.40em; font-family: 'Crimson Pro', serif; color: black;">Steps</div>
+                <div class="ui segment left aligned scrollable-segment" style="font-size:1.25em;">
+                    <div class="ui divided ordered list" style=" max-height: 50%; overflow-y: auto">
+                        {% for step in recipe['steps'] %}
+                        <div class="item">
+                            <p style="margin-left: 8px;">{{ step }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="three wide column">
+            <div class="ui segments">
+                <div class="ui segment secondary header"
+                    style="font-size:1.40em; font-family: 'Crimson Pro', serif; color: black;">Ingredients</div>
+                <div class="ui segment left aligned" style="font-size:1.35em;">
+                    <div class="ui list">
+                        {% for ingredient in recipe['ingredients'] %}
+                        <div class="item">
+                            <div class="ui checkbox">
+                                <input type="checkbox" name="example">
+                                <label>{{ ingredient }}</label>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if g.user %}
+        <div class="one wide column">
+            <i id="bookmark" onclick="onClickBookmark()" class="huge outline bookmark icon" style="display: none;"></i>
+        </div>
+        {% endif %}
+    </div>
+    <div class="ui segments" style="margin-right:25.5%;">
+        <div class="ui segment secondary header"
+            style="font-size:1.40em; font-family: 'Crimson Pro', serif; color: black;">Tags</div>
+        <div class="ui segment left aligned">
+            <div class="ui horizontal list">
+                {% for tag in recipe['tags'] %}
+                <div class="item">
+                    <a href="{{ url_for('search.results', search_type='Tag', search_input=tag, dish_type=dish_type) }}" class="ui tag label"
+                        style=" color: black; font-size:0.90em; margin-bottom:5px; margin-right:5px;">{{ tag }}</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <script>
+        let recipe_saved = false
+
+        let user = "{{ g.user }}"
+        if (user !== 'None') {
+            console.log('yes user')
+            console.log("Retrieving saved status...")
+            getSave()
+        }
+
+        function getSave() {
+            const url = `/recipe/check_saved/{{ recipe['id'] }}`
+
+            fetch(url, methods = ['GET'])
+                .then(response => response.json())
+                .then(data => {
+                    responseData = data;
+                    const bookmark = document.getElementById('bookmark')
+                    if (responseData === 1) {
+                        bookmark.classList.remove('outline')
+                        recipe_saved = true
+                    }
+                    console.log(`Saved status retrieved: ${recipe_saved}`)
+                    bookmark.style.display = ""
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+        
+        function onClickBookmark() {
+            const bookmark = document.getElementById('bookmark')
+            if (recipe_saved == false) {
+                saveRecipe()
+                bookmark.classList.remove('outline')
+                recipe_saved = true
+            } else {
+                unsaveRecipe()
+                bookmark.classList.add('outline')
+                recipe_saved = false
+            }
+            console.log(`Updated saved status: ${recipe_saved}`)
+        }
+
+        function saveRecipe() {
+            const url = '/recipe/save_recipe';
+            const data = {
+                recipe_id: "{{ recipe['id'] }}",
+                dish_type: "{{ recipe['dish_type'] }}",
+                recipe_name: "{{ recipe['name'] }}"
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Request failed');
+                    }
+                })
+                .then(data => {
+                    // Handle the response data from the Flask server
+                    console.log(data);
+                })
+                .catch(error => {
+                    // Handle any errors that occurred during the request
+                    console.error('Error:', error);
+                });
+        }
+
+        function unsaveRecipe() {
+            const url = '/recipe/unsave_recipe';
+            const data = {
+                recipe_id: "{{ recipe['id'] }}",
+                from_page: 'recipe'
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Request failed');
+                    }
+                })
+                .then(data => {
+                    // Handle the response data from the Flask server
+                    console.log(data);
+                })
+                .catch(error => {
+                    // Handle any errors that occurred during the request
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+    {% endblock %}
