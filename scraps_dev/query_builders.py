@@ -151,9 +151,7 @@ def get_user_saved(user_id):
     '''
 
 def get_recipe(id, dish_type):
-    print(f'dish type : {dish_type}')
     table = get_db_table(dish_type)
-    print(f'table :  {table}')
     return f'''
     SELECT {table}_recipes.recipe_id, {table}_recipes.recipe_name, {table}_ingredients.recipe_ingredients, {table}_steps.recipe_steps, {table}_tags.recipe_tags
     FROM {table}_recipes
@@ -200,10 +198,16 @@ def check_recipe_saved(user_id, recipe_id):
     recipe_id = {recipe_id}
     '''
 
-def add_user_history_item(user_id, item_type, dish_type, item_content, occurred_at):
+def add_user_history_item(values):
     return f'''
     INSERT INTO user_history (user_id, item_type, dish_type, item_content, occurred_at)
-    VALUES ({user_id}, '{item_type}', '{dish_type}', '{item_content}', '{occurred_at}')
+    VALUES (
+        {values['user_id']},
+        '{values['item_type']}',
+        '{values['dish_type']}',
+        '{values['item_content']}',
+        '{values['occurred_at']}'
+    )
     '''
 
 def get_recipes_with_tag(tag, dish_type, order_by):
@@ -250,13 +254,13 @@ def recipes_by_string_query(string, dish_type, order_by):
     LIMIT 100;
     '''
 
-def check_already_in_history(user_id, item_type, item_content, dish_type):
-    print(f'at qb : {user_id}, {item_type}, {item_content}, {dish_type}')
+def check_already_in_history(values):
     return f'''
     SELECT *
     FROM user_history
-    WHERE user_id = {user_id} AND
-    item_type = "{item_type}" AND
-    item_content = "{item_content}" AND
-    dish_type = "{dish_type}";
+    WHERE user_id = {values['user_id']} AND
+    item_type = "{values['item_type']}" AND
+    item_content = "{values['item_content']}" AND
+    dish_type = "{values['dish_type']}" AND
+    DATE(occurred_at) = "{values['occurred_at']}";
     '''

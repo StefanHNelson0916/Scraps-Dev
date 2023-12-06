@@ -63,7 +63,6 @@ def get_ingredients_recipe_count(ingredients, dish_type):
 
 
 def get_recipes_by_ingredient(dish_type, ingredients, order_by):
-    print(f"{dish_type},{ingredients},{order_by}")
     query = qb.get_recipes_by_ingredient(dish_type, ingredients, order_by)
     recipes = get_all(query=query)
     return recipes
@@ -164,10 +163,8 @@ def check_recipe_saved(user_id, recipe_id):
     return result
 
 
-def add_user_history_item(user_id, item_type, dish_type, item_content, occurred_at):
-    query = qb.add_user_history_item(
-        user_id, item_type, dish_type, item_content, occurred_at
-    )
+def add_user_history_item(values):
+    query = qb.add_user_history_item(values)
     add_item(query)
 
 
@@ -189,11 +186,10 @@ def get_recipes_by_string(string, dish_type, order_by):
     return recipes
 
 
-def check_already_in_history(user_id, item_type, item_content, dish_type):
-    query = qb.check_already_in_history(user_id, item_type, item_content, dish_type)
+def check_already_in_history(values):
+    query = qb.check_already_in_history(values)
     recipes = get_all(query)
-    current_date = datetime.now().date()
-    for recipe in recipes:
-        if recipe[5].date() == current_date:
-            return True
-    return False
+    if len(recipes) > 0:
+        return True
+    else:
+        return False
