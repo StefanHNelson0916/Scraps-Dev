@@ -19,7 +19,6 @@ def page(recipe_id, dish_type):
     #     action_content = recipe_name  + '@' + str(recipe_id)
     #     occurred_at = datetime.now().date()
     #     db.add_user_history_item(user_id, action_type, dish_type, action_content, occurred_at)  
-    print(f'recipe object dish type : {recipe['dish_type']}')
     return render_template("recipe_page.html", recipe=recipe, dish_type=dish_type)
 
 @bp.route("/saved_recipe_page/<recipe_id>/<dish_type>/<name>")
@@ -36,7 +35,6 @@ def get_saved_recipe(recipe_id, dish_type, name):
 @bp.route("/check_saved/<recipe_id>", methods=["GET"])
 def check_saved(recipe_id):
     data = recipe_id
-    print()
     if session.get("user_id"):
         user_id = session.get("user_id")
         check_result = db.check_recipe_saved(user_id=user_id, recipe_id=recipe_id)

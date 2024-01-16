@@ -43,9 +43,7 @@ class HistoryItem:
         self.occurred_at = values['occurred_at'].date().strftime("%m-%d-%Y")
 
 def item_types_string_formatter(item_types : str, dish_type : str) -> str:
-    print(f'item_types : {item_types}')
     item_types : list = item_types.split(':')
-    print(f'item_types : {item_types}')
     history_action_type : str = item_types[0]
     search_action_type : str = item_types[1].lower()
     if history_action_type == 'Searched':

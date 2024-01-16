@@ -15,7 +15,6 @@ def profile():
 
     history_items : list = []
     for item_values in user_history:
-        print(f'item_values : {item_values}')
         history_item : HistoryItem = HistoryItem(item_values)
         history_item_dict : dict = vars(history_item)
         history_items.append(history_item_dict)
@@ -33,8 +32,6 @@ def profile():
 
 @bp.route("/history_item/<action_id>")
 def get_history_item(action_id):
-    print(db.get_user_history_item(action_id))
-
     history_item = HistoryItem(db.get_user_history_item(action_id))
     action_type = history_item.action_type
 
@@ -70,7 +67,5 @@ def get_history_item(action_id):
 def unsave_recipe(recipe_id):
     user_id = g.user[0]
     recipe_id = recipe_id
-    print(f'unsaving recipe: {recipe_id}')
-
     db.unsave_recipe(user_id, recipe_id)
     return redirect(url_for('profile.profile'))
